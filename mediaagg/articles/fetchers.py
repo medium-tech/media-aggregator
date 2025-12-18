@@ -5,6 +5,7 @@ Fetchers for news articles from various APIs.
 import os
 import requests
 from typing import List, Dict, Optional
+from mediaagg.storage import save_article
 
 
 def fetch_nytimes(
@@ -12,6 +13,7 @@ def fetch_nytimes(
     begin_date: Optional[str] = None,
     end_date: Optional[str] = None,
     api_key: Optional[str] = None,
+    save_to_disk: bool = True,
 ) -> List[Dict]:
     """
     Fetch articles from New York Times API.
@@ -21,9 +23,10 @@ def fetch_nytimes(
         begin_date: Start date in YYYYMMDD format
         end_date: End date in YYYYMMDD format
         api_key: NY Times API key (if not provided, reads from env)
+        save_to_disk: If True, saves articles to disk; if False, returns them
     
     Returns:
-        List of article dictionaries
+        List of article dictionaries (empty if save_to_disk is True)
     """
     if api_key is None:
         api_key = os.getenv("NYTIMES_API_KEY")
@@ -63,8 +66,11 @@ def fetch_nytimes(
             "author": doc.get("byline", {}).get("original", ""),
         }
         articles.append(article)
+        
+        if save_to_disk:
+            save_article(article, "nytimes")
     
-    return articles
+    return articles if not save_to_disk else []
 
 
 def fetch_mediastack(
@@ -75,6 +81,7 @@ def fetch_mediastack(
     date_to: Optional[str] = None,
     limit: int = 100,
     api_key: Optional[str] = None,
+    save_to_disk: bool = True,
 ) -> List[Dict]:
     """
     Fetch articles from Mediastack API.
@@ -87,9 +94,10 @@ def fetch_mediastack(
         date_to: End date in YYYY-MM-DD format
         limit: Maximum number of results
         api_key: Mediastack API key (if not provided, reads from env)
+        save_to_disk: If True, saves articles to disk; if False, returns them
     
     Returns:
-        List of article dictionaries
+        List of article dictionaries (empty if save_to_disk is True)
     """
     if api_key is None:
         api_key = os.getenv("MEDIASTACK_API_KEY")
@@ -134,8 +142,11 @@ def fetch_mediastack(
             "image": item.get("image", ""),
         }
         articles.append(article)
+        
+        if save_to_disk:
+            save_article(article, "mediastack")
     
-    return articles
+    return articles if not save_to_disk else []
 
 
 def fetch_gnews(
@@ -147,6 +158,7 @@ def fetch_gnews(
     from_date: Optional[str] = None,
     to_date: Optional[str] = None,
     api_key: Optional[str] = None,
+    save_to_disk: bool = True,
 ) -> List[Dict]:
     """
     Fetch articles from GNews (Google News) API.
@@ -160,9 +172,10 @@ def fetch_gnews(
         from_date: Start date in ISO format
         to_date: End date in ISO format
         api_key: GNews API key (if not provided, reads from env)
+        save_to_disk: If True, saves articles to disk; if False, returns them
     
     Returns:
-        List of article dictionaries
+        List of article dictionaries (empty if save_to_disk is True)
     """
     if api_key is None:
         api_key = os.getenv("GNEWS_API_KEY")
@@ -214,5 +227,8 @@ def fetch_gnews(
             "image": item.get("image", ""),
         }
         articles.append(article)
+        
+        if save_to_disk:
+            save_article(article, "gnews")
     
-    return articles
+    return articles if not save_to_disk else []

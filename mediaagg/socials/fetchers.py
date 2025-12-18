@@ -5,6 +5,7 @@ Fetchers for social media posts.
 import os
 import tweepy
 from typing import List, Dict, Optional
+from mediaagg.storage import save_tweet
 
 
 def fetch_tweets(
@@ -13,6 +14,7 @@ def fetch_tweets(
     end_time: Optional[str] = None,
     max_results: int = 100,
     bearer_token: Optional[str] = None,
+    save_to_disk: bool = True,
 ) -> List[Dict]:
     """
     Fetch tweets from a Twitter/X user.
@@ -23,9 +25,10 @@ def fetch_tweets(
         end_time: End time in ISO 8601 format
         max_results: Maximum number of tweets to fetch (10-100, default: 100)
         bearer_token: Twitter API bearer token (if not provided, reads from env)
+        save_to_disk: If True, saves tweets to disk; if False, returns them
     
     Returns:
-        List of tweet dictionaries
+        List of tweet dictionaries (empty if save_to_disk is True)
     """
     if bearer_token is None:
         bearer_token = os.getenv("TWITTER_BEARER_TOKEN")
@@ -109,5 +112,8 @@ def fetch_tweets(
             ]
         
         tweet_list.append(tweet_dict)
+        
+        if save_to_disk:
+            save_tweet(tweet_dict)
     
-    return tweet_list
+    return tweet_list if not save_to_disk else []
