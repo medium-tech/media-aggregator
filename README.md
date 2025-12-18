@@ -144,14 +144,47 @@ The media aggregator uses several APIs for fetching news articles and social med
 
 **For local development:**
 
-1. **Using Docker (recommended):**
+1. **Using Docker Compose (recommended):**
+   
+   The project includes a `docker-compose.yml` file that sets up both OpenSearch and OpenSearch Dashboards:
+   
+   ```bash
+   # Start OpenSearch and OpenSearch Dashboards
+   docker-compose up -d
+   
+   # Check if services are running
+   docker-compose ps
+   
+   # View logs
+   docker-compose logs -f
+   
+   # Stop services
+   docker-compose down
+   
+   # Stop and remove data volumes
+   docker-compose down -v
+   ```
+   
+   Once started, you can access:
+   - **OpenSearch**: http://localhost:9200
+   - **OpenSearch Dashboards**: http://localhost:5601
+   
+   Default credentials:
+   - Username: `admin`
+   - Password: `Admin123!`
+
+2. **Using Docker directly (alternative):**
+   
+   If you prefer to run OpenSearch only without Docker Compose:
+   
    ```bash
    docker run -d -p 9200:9200 -p 9600:9600 -e "discovery.type=single-node" \
      -e "OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin123!" \
      opensearchproject/opensearch:latest
    ```
 
-2. **Configure in `.env`:**
+3. **Configure in `.env`:**
+   
    ```
    OPENSEARCH_HOST=localhost
    OPENSEARCH_PORT=9200
