@@ -197,9 +197,18 @@ The media aggregator uses several APIs for fetching news articles and social med
 
 ### Usage
 
-#### Fetching News Articles
+The media aggregator uses a **two-step workflow**:
+1. **Fetch**: Download raw data from APIs and save to disk as JSON files
+2. **Index**: Read data from disk and index into OpenSearch
 
-The package provides CLI commands for fetching articles from different sources:
+This workflow allows you to:
+- Rebuild OpenSearch indices without re-fetching data
+- Preserve raw data for future processing
+- Separate data collection from indexing
+
+#### Step 1: Fetching News Articles
+
+Fetch articles from various sources and save them to disk:
 
 **NY Times:**
 ```bash
@@ -208,9 +217,6 @@ mediaagg-articles nytimes --query "artificial intelligence"
 
 # With date filtering (YYYYMMDD format)
 mediaagg-articles nytimes --query "climate change" --begin-date 20240101 --end-date 20241231
-
-# Print without indexing
-mediaagg-articles nytimes --query "technology" --no-index
 ```
 
 **Mediastack:**
@@ -237,18 +243,41 @@ mediaagg-articles gnews --category "technology" --max-results 50
 mediaagg-articles gnews --query "sports" --lang "en" --country "us"
 ```
 
+Articles are saved to `./data/<source_name>/` by default (configurable via `DATA_ROOT` environment variable).
+
+#### Step 2: Indexing Articles
+
+Once articles are fetched, index them into OpenSearch:
+
+```bash
+# Index NY Times articles
+mediaagg-articles index nytimes
+
+# Index Mediastack articles
+mediaagg-articles index mediastack
+
+# Index Google News articles
+mediaagg-articles index gnews
+```
+
 #### Fetching Social Media Posts
 
 **Twitter/X:**
 ```bash
-# Fetch tweets from a user
+# Fetch tweets from a user and save to disk
 mediaagg-socials tweets elonmusk --max-results 50
 
 # With date filtering (ISO 8601 format)
 mediaagg-socials tweets nytimes --start-time "2024-01-01T00:00:00Z" --end-time "2024-12-31T23:59:59Z"
+```
 
-# Print without indexing
-mediaagg-socials tweets nasa --no-index
+Tweets are saved to `./data/tweets/` by default.
+
+#### Indexing Tweets
+
+```bash
+# Index all tweets from disk
+mediaagg-socials index
 ```
 
 ### Python API Usage
@@ -258,15 +287,47 @@ You can also use the package programmatically:
 ```python
 from mediaagg.articles import fetch_nytimes, fetch_mediastack, fetch_gnews, index_articles
 from mediaagg.socials import fetch_tweets, index_tweets
+from mediaagg.storage import load_all_data
 
-# Fetch articles
-articles = fetch_nytimes(query="technology", begin_date="20240101")
+# Fetch articles (saves to disk by default)
+fetch_nytimes(query="technology", begin_date="20240101", save_to_disk=True)
+
+# Load articles from disk and index
+articles = load_all_data("nytimes")
 index_articles(articles, source_name="nytimes")
 
-# Fetch tweets
-tweets = fetch_tweets(username="elonmusk", max_results=100)
+# Fetch tweets (saves to disk by default)
+fetch_tweets(username="elonmusk", max_results=100, save_to_disk=True)
+
+# Load tweets from disk and index
+tweets = load_all_data("tweets")
 index_tweets(tweets)
 ```
+
+### Data Storage
+
+Raw data is stored in the directory specified by the `DATA_ROOT` environment variable (default: `./data`).
+
+**Directory structure:**
+```
+data/
+├── nytimes/          # NY Times articles
+│   ├── abc123.json
+│   └── def456.json
+├── mediastack/       # Mediastack articles
+│   ├── ghi789.json
+│   └── jkl012.json
+├── gnews/            # Google News articles
+│   ├── mno345.json
+│   └── pqr678.json
+└── tweets/           # Twitter/X posts
+    ├── 1234567890.json
+    └── 9876543210.json
+```
+
+Each article is stored as a separate JSON file with a unique identifier:
+- **Articles**: Filename is the MD5 hash of the article URL
+- **Tweets**: Filename is the tweet ID
 
 ### OpenSearch Indices
 
