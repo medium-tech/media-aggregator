@@ -18,11 +18,13 @@ def nytimes_command(args):
     """Fetch articles from NY Times API."""
     try:
         print(f"Fetching articles from NY Times...")
+        # Use provided API key or fall back to environment variable
+        api_key = args.api_key or os.getenv("NYTIMES_API_KEY")
         articles = fetch_nytimes(
             query=args.query,
             begin_date=args.begin_date,
             end_date=args.end_date,
-            api_key=args.api_key,
+            api_key=api_key,
         )
         
         print(f"Found {len(articles)} articles")
@@ -48,6 +50,8 @@ def mediastack_command(args):
     """Fetch articles from Mediastack API."""
     try:
         print(f"Fetching articles from Mediastack...")
+        # Use provided API key or fall back to environment variable
+        api_key = args.api_key or os.getenv("MEDIASTACK_API_KEY")
         articles = fetch_mediastack(
             keywords=args.keywords,
             countries=args.countries,
@@ -55,7 +59,7 @@ def mediastack_command(args):
             date_from=args.date_from,
             date_to=args.date_to,
             limit=args.limit,
-            api_key=args.api_key,
+            api_key=api_key,
         )
         
         print(f"Found {len(articles)} articles")
@@ -81,6 +85,8 @@ def gnews_command(args):
     """Fetch articles from Google News (GNews) API."""
     try:
         print(f"Fetching articles from Google News...")
+        # Use provided API key or fall back to environment variable
+        api_key = args.api_key or os.getenv("GNEWS_API_KEY")
         articles = fetch_gnews(
             query=args.query,
             category=args.category,
@@ -89,7 +95,7 @@ def gnews_command(args):
             max_results=args.max_results,
             from_date=args.from_date,
             to_date=args.to_date,
-            api_key=args.api_key,
+            api_key=api_key,
         )
         
         print(f"Found {len(articles)} articles")
@@ -123,7 +129,7 @@ def cli():
     nytimes_parser.add_argument("-q", "--query", help="Search query")
     nytimes_parser.add_argument("--begin-date", help="Begin date (YYYYMMDD format)")
     nytimes_parser.add_argument("--end-date", help="End date (YYYYMMDD format)")
-    nytimes_parser.add_argument("--api-key", default=os.getenv("NYTIMES_API_KEY"), help="NY Times API key")
+    nytimes_parser.add_argument("--api-key", help="NY Times API key (defaults to NYTIMES_API_KEY env var)")
     nytimes_parser.add_argument("--no-index", action="store_true", help="Don't index results, just print them")
     nytimes_parser.set_defaults(func=nytimes_command)
     
@@ -135,7 +141,7 @@ def cli():
     mediastack_parser.add_argument("--date-from", help="Start date (YYYY-MM-DD format)")
     mediastack_parser.add_argument("--date-to", help="End date (YYYY-MM-DD format)")
     mediastack_parser.add_argument("--limit", type=int, default=100, help="Maximum number of results")
-    mediastack_parser.add_argument("--api-key", default=os.getenv("MEDIASTACK_API_KEY"), help="Mediastack API key")
+    mediastack_parser.add_argument("--api-key", help="Mediastack API key (defaults to MEDIASTACK_API_KEY env var)")
     mediastack_parser.add_argument("--no-index", action="store_true", help="Don't index results, just print them")
     mediastack_parser.set_defaults(func=mediastack_command)
     
@@ -148,7 +154,7 @@ def cli():
     gnews_parser.add_argument("--max-results", type=int, default=10, help="Maximum number of results")
     gnews_parser.add_argument("--from-date", help="Start date (ISO format)")
     gnews_parser.add_argument("--to-date", help="End date (ISO format)")
-    gnews_parser.add_argument("--api-key", default=os.getenv("GNEWS_API_KEY"), help="GNews API key")
+    gnews_parser.add_argument("--api-key", help="GNews API key (defaults to GNEWS_API_KEY env var)")
     gnews_parser.add_argument("--no-index", action="store_true", help="Don't index results, just print them")
     gnews_parser.set_defaults(func=gnews_command)
     

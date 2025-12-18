@@ -22,12 +22,14 @@ def tweets_command(args):
     """
     try:
         print(f"Fetching tweets from @{args.username}...")
+        # Use provided bearer token or fall back to environment variable
+        bearer_token = args.bearer_token or os.getenv("TWITTER_BEARER_TOKEN")
         tweet_list = fetch_tweets(
             username=args.username,
             start_time=args.start_time,
             end_time=args.end_time,
             max_results=args.max_results,
-            bearer_token=args.bearer_token,
+            bearer_token=bearer_token,
         )
         
         print(f"Found {len(tweet_list)} tweets")
@@ -66,7 +68,7 @@ def cli():
     tweets_parser.add_argument("--start-time", help="Start time in ISO 8601 format (e.g., '2024-01-01T00:00:00Z')")
     tweets_parser.add_argument("--end-time", help="End time in ISO 8601 format")
     tweets_parser.add_argument("--max-results", type=int, default=100, help="Maximum number of tweets (10-100, default: 100)")
-    tweets_parser.add_argument("--bearer-token", default=os.getenv("TWITTER_BEARER_TOKEN"), help="Twitter API bearer token")
+    tweets_parser.add_argument("--bearer-token", help="Twitter API bearer token (defaults to TWITTER_BEARER_TOKEN env var)")
     tweets_parser.add_argument("--no-index", action="store_true", help="Don't index results, just print them")
     tweets_parser.set_defaults(func=tweets_command)
     
