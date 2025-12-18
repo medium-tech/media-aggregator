@@ -326,7 +326,7 @@ data/
 ```
 
 Each article is stored as a separate JSON file with a unique identifier:
-- **Articles**: Filename is the MD5 hash of the article URL
+- **Articles**: Filename is the SHA-256 hash of the article URL
 - **Tweets**: Filename is the tweet ID
 
 ### OpenSearch Indices

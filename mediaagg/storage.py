@@ -3,6 +3,7 @@ Storage utilities for saving and loading raw data to/from disk.
 """
 
 import os
+import sys
 import json
 import hashlib
 from pathlib import Path
@@ -153,5 +154,5 @@ def load_all_data(source_name: str) -> List[Dict]:
             item = load_data_file(str(filepath))
             data.append(item)
         except (json.JSONDecodeError, IOError) as e:
-            print(f"Warning: Failed to load {filepath}: {e}")
+            print(f"Warning: Failed to load {filepath}: {e}", file=sys.stderr)
     return data
