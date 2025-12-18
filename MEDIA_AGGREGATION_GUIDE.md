@@ -1188,9 +1188,10 @@ pip install openai
 
 **Example - Using GPT for Complex Analysis:**
 ```python
-import openai
+from openai import OpenAI
 
-openai.api_key = 'your_openai_api_key'
+# Initialize client (uses OPENAI_API_KEY environment variable by default)
+client = OpenAI(api_key='your_openai_api_key')
 
 def analyze_with_gpt(article_text, analysis_type='summary'):
     prompts = {
@@ -1205,7 +1206,7 @@ def analyze_with_gpt(article_text, analysis_type='summary'):
         'fact_check': f"Identify claims in this article that should be fact-checked:\n\n{article_text}"
     }
     
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": "You are a helpful assistant that analyzes news articles."},
