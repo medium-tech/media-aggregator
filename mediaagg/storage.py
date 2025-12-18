@@ -48,14 +48,14 @@ def generate_article_id(article: Dict) -> str:
         Unique ID string suitable for filename
     """
     if "url" in article and article["url"]:
-        # Use hash of URL
-        return hashlib.md5(article["url"].encode()).hexdigest()
+        # Use SHA-256 hash of URL for better collision resistance
+        return hashlib.sha256(article["url"].encode()).hexdigest()
     
     # Fallback: hash of title + published_date
     title = article.get("title", "")
     pub_date = article.get("published_date", "")
     content = f"{title}{pub_date}"
-    return hashlib.md5(content.encode()).hexdigest()
+    return hashlib.sha256(content.encode()).hexdigest()
 
 
 def save_article(article: Dict, source_name: str) -> str:
@@ -90,7 +90,13 @@ def save_tweet(tweet: Dict, source_name: str = "tweets") -> str:
     
     Returns:
         Path to the saved file
+    
+    Raises:
+        KeyError: If tweet does not have an 'id' field
     """
+    if "id" not in tweet:
+        raise KeyError("Tweet dictionary must have an 'id' field")
+    
     source_dir = get_source_dir(source_name)
     tweet_id = str(tweet["id"])
     filename = f"{tweet_id}.json"
