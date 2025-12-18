@@ -22,15 +22,20 @@ def get_opensearch_client(
         host: OpenSearch host (defaults to env or 'localhost')
         port: OpenSearch port (defaults to env or 9200)
         username: OpenSearch username (defaults to env or 'admin')
-        password: OpenSearch password (defaults to env)
+        password: OpenSearch password (defaults to env, REQUIRED for production)
         use_ssl: Whether to use SSL (defaults to env or False)
     
     Returns:
         Configured OpenSearch client
+    
+    Note:
+        For production use, always set OPENSEARCH_PASSWORD in environment variables.
+        The 'admin' default is only for local development.
     """
     host = host or os.getenv("OPENSEARCH_HOST", "localhost")
     port = int(port or os.getenv("OPENSEARCH_PORT", "9200"))
     username = username or os.getenv("OPENSEARCH_USERNAME", "admin")
+    # Default 'admin' password is for local development only
     password = password or os.getenv("OPENSEARCH_PASSWORD", "admin")
     use_ssl = use_ssl if use_ssl is not None else os.getenv("OPENSEARCH_USE_SSL", "false").lower() == "true"
     
@@ -126,10 +131,21 @@ def index_articles(
             "indexed_date": datetime.now().isoformat(),
         }
         
+        # Use URL as document ID to prevent duplicates
+        doc_id = None
+        if "url" in article and article["url"]:
+            # Create a hash of the URL for document ID
+            import hashlib
+            doc_id = hashlib.md5(article["url"].encode()).hexdigest()
+        
         action = {
             "_index": index_name,
             "_source": doc,
         }
+        
+        if doc_id:
+            action["_id"] = doc_id
+        
         actions.append(action)
     
     # Bulk index

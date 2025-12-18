@@ -4,7 +4,6 @@ Fetchers for news articles from various APIs.
 
 import os
 import requests
-from datetime import datetime, timedelta
 from typing import List, Dict, Optional
 
 

@@ -4,7 +4,6 @@ Fetchers for social media posts.
 
 import os
 import tweepy
-from datetime import datetime
 from typing import List, Dict, Optional
 
 
