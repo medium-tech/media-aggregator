@@ -4,6 +4,8 @@ Fetchers for news articles from various APIs.
 
 import os
 import requests
+
+from datetime import datetime
 from typing import List, Dict, Optional
 from mediaagg.storage import save_article
 
