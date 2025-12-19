@@ -92,9 +92,9 @@ def index_articles(
         # Use URL as document ID to prevent duplicates
         doc_id = None
         if "url" in article and article["url"]:
-            # Create a hash of the URL for document ID
+            # Create a SHA-256 hash of the URL for document ID
             import hashlib
-            doc_id = hashlib.md5(article["url"].encode()).hexdigest()
+            doc_id = hashlib.sha256(article["url"].encode()).hexdigest()
         
         action = {
             "_index": index_name,
