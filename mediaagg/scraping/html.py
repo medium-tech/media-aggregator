@@ -46,7 +46,7 @@ def scrape_html(url: str, source_name: str = "scraped") -> str:
     
     # Render HTML to image
     print("Rendering HTML to image...")
-    hti = Html2Image(output_path=str(article_folder))
+    hti = Html2Image(output_path=str(article_folder), custom_flags=['--no-sandbox'])
     image_filename = "rendered.png"
     hti.screenshot(html_str=html_content, save_as=image_filename)
     image_path = article_folder / image_filename
