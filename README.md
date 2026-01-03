@@ -62,7 +62,30 @@ See [MEDIA_AGGREGATION_GUIDE.md](MEDIA_AGGREGATION_GUIDE.md) for detailed inform
    pip install -e .
    ```
 
-4. **Set up environment variables:**
+4. **Install system dependencies for web scraping (optional):**
+   
+   The scraping module requires additional system dependencies:
+   
+   **On Ubuntu/Debian:**
+   ```bash
+   # Install Tesseract OCR and Chrome/Chromium for html2image
+   sudo apt-get update
+   sudo apt-get install -y tesseract-ocr chromium-browser
+   ```
+   
+   **On macOS:**
+   ```bash
+   # Install Tesseract OCR and Chrome
+   brew install tesseract
+   brew install --cask google-chrome
+   ```
+   
+   **On Windows:**
+   - Download and install [Tesseract OCR](https://github.com/UB-Mannheim/tesseract/wiki)
+   - Download and install [Google Chrome](https://www.google.com/chrome/)
+   - Add Tesseract to your PATH environment variable
+
+5. **Set up environment variables:**
    ```bash
    cp .env.example .env
    # Edit .env and add your API keys
@@ -278,6 +301,40 @@ Tweets are saved to `./data/tweets/` by default.
 ```bash
 # Index all tweets from disk
 mediaagg-socials index
+```
+
+#### Web Scraping
+
+The scraping module allows you to download web pages, render them as images, and extract text via OCR:
+
+**Scrape a web page:**
+```bash
+# Scrape a URL and save all artifacts (HTML, image, extracted text)
+mediaagg-scraping https://example.com
+
+# Specify a custom source name for organization
+mediaagg-scraping https://news.ycombinator.com --source hackernews
+```
+
+The scraping tool will:
+1. Download the raw HTML and save as `raw.html`
+2. Render the HTML as an image and save as `rendered.png`
+3. Extract text from the image using OCR and save as `extracted_text.txt`
+4. Store all artifacts in `./data/<source_name>/<article_id>/`
+
+The article ID is generated as a SHA-256 hash of the URL, ensuring each unique URL gets its own folder.
+
+**Output example:**
+```
+Scraping URL: https://example.com
+Downloading HTML from https://example.com...
+Saved raw HTML to ./data/scraped/5d41402a.../raw.html
+Rendering HTML to image...
+Saved rendered image to ./data/scraped/5d41402a.../rendered.png
+Extracting text from image via OCR...
+Saved extracted text to ./data/scraped/5d41402a.../extracted_text.txt
+
+Article folder: ./data/scraped/5d41402abc4fd2403c9...
 ```
 
 ### Python API Usage

@@ -29,6 +29,8 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "opensearch-py>=2.4.0",
     "tweepy>=4.14.0",
+    "html2image>=2.0.0",
+    "pytesseract>=0.3.10",
 ]
 
 [project.optional-dependencies]
@@ -43,6 +45,7 @@ dev = [
 [project.scripts]
 mediaagg-articles = "mediaagg.articles.__main__:cli"
 mediaagg-socials = "mediaagg.socials.__main__:cli"
+mediaagg-scraping = "mediaagg.scraping.__main__:cli"
 
 [tool.setuptools.packages.find]
 where = ["."]
