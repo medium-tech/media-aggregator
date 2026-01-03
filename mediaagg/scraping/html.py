@@ -2,10 +2,8 @@
 HTML scraping module for downloading, rendering, and extracting text from web pages.
 """
 
-import os
 import hashlib
 from pathlib import Path
-from typing import Optional
 import requests
 from html2image import Html2Image
 import pytesseract
@@ -20,7 +18,7 @@ def scrape_html(url: str, source_name: str = "scraped") -> str:
         source_name: Name of the data source (default: 'scraped')
     
     Returns:
-        Path to the article folder containing all artifacts
+        String path to the article folder containing all artifacts
     """
     from mediaagg.storage import get_source_dir
     
