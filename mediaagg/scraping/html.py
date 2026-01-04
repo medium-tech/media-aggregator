@@ -3,13 +3,14 @@ HTML scraping module for downloading, rendering, and extracting text from web pa
 """
 
 import hashlib
-from pathlib import Path
 import requests
 from html2image import Html2Image
 import pytesseract
 
+from mediaagg.storage import get_source_dir
 
-def scrape_html(url: str, source_name: str = "scraped") -> str:
+
+def scrape_html(url: str, source_name: str = "scraped", screenshot: bool=True) -> str:
     """
     Scrape a web page: download HTML, render to image, and extract text via OCR.
     
@@ -20,7 +21,6 @@ def scrape_html(url: str, source_name: str = "scraped") -> str:
     Returns:
         String path to the article folder containing all artifacts
     """
-    from mediaagg.storage import get_source_dir
     
     # Generate unique article ID from URL
     article_id = hashlib.sha256(url.encode()).hexdigest()
@@ -43,21 +43,24 @@ def scrape_html(url: str, source_name: str = "scraped") -> str:
     print(f"Saved raw HTML to {html_path}")
     
     # Render HTML to image
-    print("Rendering HTML to image...")
-    hti = Html2Image(output_path=str(article_folder), custom_flags=['--no-sandbox'])
-    image_filename = "rendered.png"
-    hti.screenshot(html_str=html_content, save_as=image_filename)
-    image_path = article_folder / image_filename
-    print(f"Saved rendered image to {image_path}")
+    if screenshot:
+        print("Rendering HTML to image...")
+        hti = Html2Image(output_path=str(article_folder), custom_flags=[])
+        # hti = Html2Image(output_path=str(article_folder), custom_flags=['--virtual-time-budget=10000', '--no-sandbox'])
+        image_filename = "rendered.png"
+        hti.screenshot(html_str=html_content, save_as=image_filename)
+        # hti.screenshot(url=url, save_as=image_filename)
+        image_path = article_folder / image_filename
+        print(f"Saved rendered image to {image_path}")
     
-    # Extract text from image using OCR
-    print("Extracting text from image via OCR...")
-    extracted_text = pytesseract.image_to_string(str(image_path))
-    
-    # Save extracted text
-    text_path = article_folder / "extracted_text.txt"
-    with open(text_path, "w", encoding="utf-8") as f:
-        f.write(extracted_text)
-    print(f"Saved extracted text to {text_path}")
+        # Extract text from image using OCR
+        print("Extracting text from image via OCR...")
+        extracted_text = pytesseract.image_to_string(str(image_path))
+        
+        # Save extracted text
+        text_path = article_folder / "extracted_text.txt"
+        with open(text_path, "w", encoding="utf-8") as f:
+            f.write(extracted_text)
+        print(f"Saved extracted text to {text_path}")
     
     return str(article_folder)
